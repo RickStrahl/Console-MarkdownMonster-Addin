@@ -56,10 +56,11 @@ namespace ConsoleAddin
 
         public override void OnExecute(object sender)
         {
-    
-            
             if (ConsoleHwnd == IntPtr.Zero)
             {
+                // re-read settings in case they were changed
+                ConsoleAddinConfiguration.Current.Read();
+                
                 string args = null;
                 var path = Model.ActiveDocument?.Filename;
                 if (!string.IsNullOrEmpty(path))
@@ -144,8 +145,7 @@ namespace ConsoleAddin
 
         public override void OnExecuteConfiguration(object sender)
         {
-            MessageBox.Show("Configuration for our sample Addin", "Markdown Addin Sample",
-                            MessageBoxButton.OK, MessageBoxImage.Information);
+            Model.Window.OpenTab(Path.Combine(Model.Configuration.CommonFolder, "ConsoleAddin.json"));           
         }
 
         public override bool OnCanExecute(object sender)
