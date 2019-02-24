@@ -1,9 +1,18 @@
-﻿using MarkdownMonster.AddIns;
+using MarkdownMonster.AddIns;
 
 namespace ConsoleAddin
 {
     public class ConsoleAddinConfiguration : BaseAddinConfiguration<ConsoleAddinConfiguration>
     {
+
+        public static ConsoleAddinConfiguration Current;
+
+        static ConsoleAddinConfiguration()
+        {
+            Current = new ConsoleAddinConfiguration();
+            Current.Initialize();
+        }
+
         public ConsoleAddinConfiguration()
         {
             // uses this file for storing settings in `%appdata%\Markdown Monster`
@@ -15,5 +24,11 @@ namespace ConsoleAddin
         // Add properties for any configuration setting you want to persist and reload
         // you can access this object as 
         //     ConsoleAddinConfiguration.Current.PropertyName
+
+        public int InitialHeight { get; set; } = 200;
+
+        public string TerminalExecutable { get; set; } = "powershell.exe";
+
+        public string TerminalArguments { get; set; } = "-noexit -command \"cd '{0}'\"";
     }
 }
