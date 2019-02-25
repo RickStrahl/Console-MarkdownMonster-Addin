@@ -24,7 +24,8 @@ copy "$src\version.json" $dist
 "Copying files for Build folder..."
 copy "$src\version.json" $tgt
 copy "$src\icon.png" $tgt
-#copy "$src\screenshot.png" $tgt
+copy "$src\..\screenshot.png" $tgt
+copy "$src\..\screenshot.png" $dist
 
 "Zipping up setup file..."
 7z a -tzip  $tgt\addin.zip $dist\*.* $src\icon.png
