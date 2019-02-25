@@ -84,7 +84,7 @@ namespace ConsoleAddin
             if (ConsoleHwnd == IntPtr.Zero)            
                 CreateConsole();            
             else
-                ReleaseConsole();
+                ReleaseConsole(false); // allow re-opening if it was closed                
         }
 
         
@@ -126,13 +126,13 @@ namespace ConsoleAddin
             Model.Window.Activated += Window_LocationChanged;
         }
 
-        void ReleaseConsole()
+        void ReleaseConsole(bool force = true)
         {
             Model.Window.SizeChanged -= Window_SizeChanged;
             Model.Window.SizeChanged -= Window_SizeChanged;
             Model.Window.Activated -= Window_LocationChanged;
 
-            if (ConsoleProcess == null || ConsoleProcess.HasExited)
+            if (!force && (ConsoleProcess == null || ConsoleProcess.HasExited))
             {
                 ConsoleHwnd = IntPtr.Zero;
                 ConsoleProcess = null;
