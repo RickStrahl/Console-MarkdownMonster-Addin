@@ -6,7 +6,7 @@ cd "$PSScriptRoot"
 $src = "."
 
 # you may have to fix this target path if you rename the addin
-$dlls = "$env:appdata\Markdown Monster\Addins\ConsoleAddin"
+$dlls = "$env:appdata\Markdown Monster\Addins\Console"
 $tgt = "..\Build"
 $dist = "..\Build\Distribution"
 

@@ -21,7 +21,7 @@ namespace ConsoleAddin
 
 
             // Id - should match output folder name. REMOVE 'Addin' from the Id
-            Id = "ConsoleAddin";
+            Id = "Console";
 
             // a descriptive name - shows up on labels and tooltips for components
             // REMOVE 'Addin' from the Name
