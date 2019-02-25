@@ -1,19 +1,45 @@
 # Console Addin for Markdown Monster
+#### A simple Pinned Terminal Window Addin for Markdown Monster
 
 ![](ConsoleAddin/icon.png)
 
-This is a simple sample addin that creates a Console Powershell window and 'attaches' to the bottom of your Markdown Monster window instance. As you move the window the terminal goes along for the ride.
+This addin allows you to open a Console Terminal Window of your choice and keep it 'pinned' to the bottom of the Markdown Monster Application Window.
 
 ![](Screenshot.png)
 
-This is just an initial quickie. 
+The terminal is a standard Windows Console window and it is **pinned** to the bottom of the Markdown Monster main application window. As you move or activate the window the terminal moves with the application and so gives you continued access to the Console window while Markdown Monster is active.
 
-Things to do:
+You can choose which terminal you would like to load by providing configuration settings for the terminal executable and command line fired when clicking the terminal button in the toolbar.
 
-* Add configuration for
-    * Terminal Command Line
-    * Initial Arguments
-    * Initial Height
+You can use the Console toolbar button to toggle the Console window on and off. The opened Console is also automatically closed when you shut down Markdown Monster.
+
+## Console Configuration
+The console has a few configuration options which you can access by clicking the drop down button next to the Console icon in the toolbar and choosing **Configure Console**.
+
+The default configuration looks like this:
+
+```json
+{
+  "InitialHeight": 300,
+  "StripWindowHeader": true,
+  "TerminalExecutable": "powershell.exe",
+  "TerminalArguments": "-noexit -command \"cd '{0}'\""
+}
+```
+
+### Configuration Values
+The configuration lets you configure a few simple settings:
+
+#### Initial Height
+Specifies the initial height of the pinned Console window in pixels.
+
+#### StripWindowHeader
+If `true` removes the Window header from the Console window. This wastes a little less screen real estate as the top Windows window Chrome is removed. 
+
+If you'd rather see the standard Windows header, set this value to `false`.
+
+#### Terminal Executable and TerminalArguments
+Lets you specify the executable and command line arguments to start a new terminal session in the Console Window.
 
 ### Console Examples
 The following are configuration settings for several different consoles. Note that you can use `{0}` as the placeholder to the path of the current document. If not document is open this value will be blank or you can remove the `{0}` from the arguments to not inject the path.
@@ -55,3 +81,4 @@ The following sets up the popular ConEmu Console application by opening in the c
 ```
 
 > ConEmu uses a multi-window layout, so there's no easy way to kill console instances. It's best to explicitly close instances when you are done with them rather than closing through the Console Addin toggle button.
+
