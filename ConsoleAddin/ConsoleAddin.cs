@@ -135,6 +135,9 @@ namespace ConsoleAddin
             if (ConsoleProcess == null || ConsoleProcess.HasExited)
             {
                 ConsoleHwnd = IntPtr.Zero;
+                ConsoleProcess = null;
+
+                // start a new one since the old one was manually closed/killed
                 CreateConsole();
                 return;
             }

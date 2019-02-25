@@ -14,9 +14,11 @@ You can choose which terminal you would like to load by providing configuration 
 You can use the Console toolbar button to toggle the Console window on and off. The opened Console is also automatically closed when you shut down Markdown Monster.
 
 ## Console Configuration
-The console has a few configuration options which you can access by clicking the drop down button next to the Console icon in the toolbar and choosing **Configure Console**.
+The console has a few configuration options which you can access by clicking the drop down button next to the Console icon in the toolbar and choosing **Configure Console** which opens the JSON configuration file in Markdown Monster for editing.
 
-The default configuration looks like this:
+Alternately you can directly open `%appdata%\Markdown Monster\ConsoleAddin.json` in any editor of your choice.
+
+The default JSON configuration looks like this:
 
 ```json
 {
