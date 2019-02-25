@@ -132,6 +132,12 @@ namespace ConsoleAddin
             Model.Window.SizeChanged -= Window_SizeChanged;
             Model.Window.Activated -= Window_LocationChanged;
 
+            if (ConsoleProcess == null || ConsoleProcess.HasExited)
+            {
+                ConsoleHwnd = IntPtr.Zero;
+                CreateConsole();
+                return;
+            }
 
             if (ConsoleProcess != null)
             {
@@ -275,8 +281,7 @@ namespace ConsoleAddin
         public void RemoveWindowHeader(IntPtr hwnd)
         {
             // don't stript from ConEmu - it does funky window nesting and it doesn't work to remove header
-            if (
-                Configuration.StripWindowHeader ||
+            if (!Configuration.StripWindowHeader ||
                 StringUtils.Contains(Configuration.TerminalExecutable,
                                      "ConEmu", StringComparison.InvariantCultureIgnoreCase))
                 return;
