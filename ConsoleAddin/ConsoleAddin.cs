@@ -7,11 +7,14 @@ using System.Windows.Media;
 using FontAwesome.WPF;
 using MarkdownMonster;
 using MarkdownMonster.AddIns;
+using Westwind.Utilities;
 
 namespace ConsoleAddin
 {
     public class ConsoleAddin : MarkdownMonster.AddIns.MarkdownMonsterAddin
     {
+        ConsoleAddinConfiguration Configuration { get; set; }
+
         public override void OnApplicationStart()
         {
             base.OnApplicationStart();
@@ -41,7 +44,9 @@ namespace ConsoleAddin
                 menuItem.IconImageSource = new ImageSourceConverter()
                     .ConvertFromString("pack://application:,,,/ConsoleAddin;component/icon_22.png") as ImageSource;
             }
-            catch { }
+            catch
+            {
+            }
 
             // if you don't want to display config or main menu item clear handler
             //menuItem.ExecuteConfiguration = null;
@@ -50,65 +55,107 @@ namespace ConsoleAddin
             this.MenuItems.Add(menuItem);
         }
 
-        IntPtr ConsoleHwnd = IntPtr.Zero;        
+
+        public override void OnExecuteConfiguration(object sender)
+        {
+            Model.Window.OpenTab(Path.Combine(Model.Configuration.CommonFolder, "ConsoleAddin.json"));
+        }
+
+        public override bool OnCanExecute(object sender)
+        {
+            return true;
+        }
+
+
+        public override void OnApplicationShutdown()
+        {
+            ReleaseConsole();
+        }
+
+
+        IntPtr ConsoleHwnd = IntPtr.Zero;
         Process ConsoleProcess;
         ConsoleBox ConsoleRectangle;
 
         public override void OnExecute(object sender)
         {
-            if (ConsoleHwnd == IntPtr.Zero)
-            {
-                // re-read settings in case they were changed
-                ConsoleAddinConfiguration.Current.Read();
-                
-                string args = null;
-                var path = Model.ActiveDocument?.Filename;
-                if (!string.IsNullOrEmpty(path))
-                {
-                    path = Path.GetDirectoryName(path);
-                    args = string.Format(ConsoleAddinConfiguration.Current.TerminalArguments, path);
-                }
-                ConsoleProcess = Process.Start(ConsoleAddinConfiguration.Current.TerminalExecutable, args);
+            this.Configuration = ConsoleAddinConfiguration.Current;
 
-                while (true)
-                {
-                    ConsoleHwnd = ConsoleProcess.MainWindowHandle;
-                    if (ConsoleHwnd.ToInt32() > 0)
-                        break;
-                }
-
-                PositionConsole(true);
-
-                Model.Window.SizeChanged += Window_SizeChanged;
-                Model.Window.LocationChanged += Window_LocationChanged;
-                Model.Window.Activated += Window_LocationChanged;
-            }
+            if (ConsoleHwnd == IntPtr.Zero)            
+                CreateConsole();            
             else
-            {
-                Model.Window.SizeChanged -= Window_SizeChanged;
-                Model.Window.SizeChanged -= Window_SizeChanged;
-                Model.Window.Activated -= Window_LocationChanged;
-
-                if (ConsoleProcess != null)
-                    ConsoleProcess.Kill();
-
-                ConsoleHwnd = IntPtr.Zero;
-                
-            }
-
+                ReleaseConsole();
         }
 
+        
+
+        void CreateConsole()
+        {
+            // re-read settings in case they were changed
+            ConsoleAddinConfiguration.Current.Read();
+
+            string args = null;
+            var path = Model.ActiveDocument?.Filename;
+            if (!string.IsNullOrEmpty(path))
+            {
+                path = Path.GetDirectoryName(path);
+                args = ConsoleAddinConfiguration.Current.TerminalArguments.Replace("{0}", path);
+            }
+
+            var startInfo = new ProcessStartInfo()
+            {
+                FileName = ConsoleAddinConfiguration.Current.TerminalExecutable,
+                Arguments = args,
+
+            };
+            ConsoleProcess = Process.Start(startInfo);
+
+            while (true)
+            {
+                ConsoleHwnd = ConsoleProcess.MainWindowHandle;
+                if (ConsoleHwnd.ToInt32() > 0)
+                    break;
+            }
+
+            RemoveWindowHeader(ConsoleHwnd);
+
+            PositionConsole(true);
+
+            Model.Window.SizeChanged += Window_SizeChanged;
+            Model.Window.LocationChanged += Window_LocationChanged;
+            Model.Window.Activated += Window_LocationChanged;
+        }
+
+        void ReleaseConsole()
+        {
+            Model.Window.SizeChanged -= Window_SizeChanged;
+            Model.Window.SizeChanged -= Window_SizeChanged;
+            Model.Window.Activated -= Window_LocationChanged;
+
+
+            if (ConsoleProcess != null)
+            {
+                try
+                {
+                    ConsoleProcess.Kill();
+                }
+                catch
+                {
+                }
+
+                ConsoleProcess = null;
+            }
+            ConsoleHwnd = IntPtr.Zero;
+        }
 
         private void Window_LocationChanged(object sender, EventArgs e)
         {
             Model.Window.Dispatcher.InvokeAsync(() => PositionConsole());
-            Debug.WriteLine("Location Changed");            
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             Model.Window.Dispatcher.InvokeAsync(() => PositionConsole());
-            Debug.WriteLine("Size Changed");
         }
 
         void PositionConsole(bool initial = false)
@@ -119,12 +166,12 @@ namespace ConsoleAddin
             var hwnd = Model.Window.Hwnd;
             GetWindowRect(new HandleRef(Model.Window, hwnd), out RECT rectangle);
 
-            GetWindowRect(new HandleRef(Model.Window,ConsoleHwnd), out RECT consoleRect);
+            GetWindowRect(new HandleRef(Model.Window, ConsoleHwnd), out RECT consoleRect);
 
             if (initial || ConsoleRectangle == null)
             {
                 ConsoleRectangle = new ConsoleBox()
-                {                    
+                {
                     Height = ConsoleAddinConfiguration.Current.InitialHeight
                 };
             }
@@ -140,21 +187,14 @@ namespace ConsoleAddin
             ConsoleRectangle.X = rectangle.Left;
             ConsoleRectangle.Y = rectangle.Bottom + 2;
             SetWindowPos(ConsoleHwnd, Model.Window.Hwnd,
-                ConsoleRectangle.X , ConsoleRectangle.Y, ConsoleRectangle.Width, ConsoleRectangle.Height, SetWindowPosFlags.DoNotActivate);
+                ConsoleRectangle.X, ConsoleRectangle.Y, ConsoleRectangle.Width, ConsoleRectangle.Height,
+                SetWindowPosFlags.DoNotActivate);
         }
 
-        public override void OnExecuteConfiguration(object sender)
-        {
-            Model.Window.OpenTab(Path.Combine(Model.Configuration.CommonFolder, "ConsoleAddin.json"));           
-        }
-
-        public override bool OnCanExecute(object sender)
-        {
-            return true;
-        }
 
 
         #region Interop
+
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetWindowRect(HandleRef hWnd, out RECT lpRect);
@@ -162,10 +202,10 @@ namespace ConsoleAddin
         [StructLayout(LayoutKind.Sequential)]
         public struct RECT
         {
-            public int Left;        // x position of upper-left corner
-            public int Top;         // y position of upper-left corner
-            public int Right;       // x position of lower-right corner
-            public int Bottom;      // y position of lower-right corner
+            public int Left; // x position of upper-left corner
+            public int Top; // y position of upper-left corner
+            public int Right; // x position of lower-right corner
+            public int Bottom; // y position of lower-right corner
         }
 
 
@@ -208,8 +248,43 @@ namespace ConsoleAddin
             public int Width { get; set; }
             public int Height { get; set; }
         }
+
+
+        //Sets a window to be a child window of another window
+        [DllImport("USER32.DLL")]
+        public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+
+        //Sets window attributes
+        [DllImport("USER32.DLL")]
+        public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        //Gets window attributes
+        [DllImport("USER32.DLL")]
+        public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
+        static extern IntPtr FindWindowByCaption(IntPtr ZeroOnly, string lpWindowName);
+
+
+        //assorted constants needed
+        public static int GWL_STYLE = -16;
+        public static int WS_BORDER = 0x00800000; //window with border
+        public static int WS_DLGFRAME = 0x00400000; //window with double border but no title
+        public static int WS_CAPTION = WS_BORDER | WS_DLGFRAME; //window with a title bar
+
+        public void RemoveWindowHeader(IntPtr hwnd)
+        {
+            // don't stript from ConEmu - it does funky window nesting and it doesn't work to remove header
+            if (
+                Configuration.StripWindowHeader ||
+                StringUtils.Contains(Configuration.TerminalExecutable,
+                                     "ConEmu", StringComparison.InvariantCultureIgnoreCase))
+                return;
+
+            int style = GetWindowLong(hwnd, GWL_STYLE);
+            SetWindowLong(hwnd, GWL_STYLE, (style & ~WS_CAPTION));
+        }
+
         #endregion
-
-
     }
 }

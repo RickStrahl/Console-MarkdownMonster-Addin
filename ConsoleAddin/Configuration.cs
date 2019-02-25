@@ -25,7 +25,9 @@ namespace ConsoleAddin
         // you can access this object as 
         //     ConsoleAddinConfiguration.Current.PropertyName
 
-        public int InitialHeight { get; set; } = 200;
+        public int InitialHeight { get; set; } = 250;
+
+        public bool StripWindowHeader { get; set; } = true;
 
         public string TerminalExecutable { get; set; } = "powershell.exe";
 
