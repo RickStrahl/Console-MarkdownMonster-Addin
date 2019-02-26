@@ -11,7 +11,10 @@ The terminal is a standard Windows Console window and it is **pinned** to the bo
 
 You can choose which terminal you would like to load by providing configuration settings for the terminal executable and command line fired when clicking the terminal button in the toolbar.
 
-You can use the Console toolbar button to toggle the Console window on and off. The opened Console is also automatically closed when you shut down Markdown Monster.
+You can use the Console toolbar button to toggle the Console window on and off. The opened Console is also automatically closed when you shut down Markdown Monster.  
+
+## Installation
+You can install the Console addin from the Markdown Monster **Addin Manager**. Go to **Tools -> Addin Manager** and select the Console addin from the list.
 
 ## Console Configuration
 The console has a few configuration options which you can access by clicking the drop down button next to the Console icon in the toolbar and choosing **Configure Console** which opens the JSON configuration file in Markdown Monster for editing.
