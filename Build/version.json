@@ -3,8 +3,8 @@
   "name": "Console: Pin a Console Terminal Window to Markdown Monster",
   "summary": "This addin allows you to open a Console Terminal Window of your choice and keep it 'pinned' to the bottom of the Markdown Monster Application Window.",
   "description": "The Console Addin allows you to specify a terminal command line to open a Console window that is pinned below the Markdown Monster application window. This means when you move or activate Markdown Monster the Console window is repositioned as the application window is moved, effectively keeping the Console window pinned to Markdown Monster.\n\nThe command executable and command arguments are configurable so you can choose to run and attach the terminal of your choice.",
-  "version": "0.2",
-  "minVersion": "1.26.12",
-  "author": "© Rick Strahl, West Wind Technologies",
-  "updated": "2018-02-25T12:00:00Z"
+  "version": "0.2.2",
+  "minVersion": "1.99",
+  "author": "© Rick Strahl, West Wind Technologies, 2018-2021",
+  "updated": "2020-06-28T12:00:00Z"
 }

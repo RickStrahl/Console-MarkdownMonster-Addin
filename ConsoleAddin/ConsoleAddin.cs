@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using FontAwesome.WPF;
@@ -15,9 +16,9 @@ namespace ConsoleAddin
     {
         ConsoleAddinConfiguration Configuration { get; set; }
 
-        public override void OnApplicationStart()
+        public override async Task OnApplicationStart()
         {
-            base.OnApplicationStart();
+            await base.OnApplicationStart();
 
 
             // Id - should match output folder name. REMOVE 'Addin' from the Id
@@ -53,12 +54,13 @@ namespace ConsoleAddin
 
             // Must add the menu to the collection to display menu and toolbar items            
             this.MenuItems.Add(menuItem);
+            
         }
 
 
-        public override void OnExecuteConfiguration(object sender)
+        public override async Task OnExecuteConfiguration(object sender)
         {
-            Model.Window.OpenTab(Path.Combine(Model.Configuration.CommonFolder, "ConsoleAddin.json"));
+            await Model.Window.OpenTab(Path.Combine(Model.Configuration.CommonFolder, "ConsoleAddin.json"));
         }
 
         public override bool OnCanExecute(object sender)
@@ -67,9 +69,10 @@ namespace ConsoleAddin
         }
 
 
-        public override void OnApplicationShutdown()
+        public override Task OnApplicationShutdown()
         {
             ReleaseConsole();
+            return Task.CompletedTask;
         }
 
 
@@ -77,14 +80,16 @@ namespace ConsoleAddin
         Process ConsoleProcess;
         ConsoleBox ConsoleRectangle;
 
-        public override void OnExecute(object sender)
+        public override Task OnExecute(object sender)
         {
             this.Configuration = ConsoleAddinConfiguration.Current;
 
             if (ConsoleHwnd == IntPtr.Zero)            
                 CreateConsole();            
             else
-                ReleaseConsole(false); // allow re-opening if it was closed                
+                ReleaseConsole(false); // allow re-opening if it was closed
+
+            return Task.CompletedTask;
         }
 
         
