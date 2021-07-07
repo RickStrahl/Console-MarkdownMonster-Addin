@@ -5,7 +5,7 @@ namespace ConsoleAddin
     public class ConsoleAddinConfiguration : BaseAddinConfiguration<ConsoleAddinConfiguration>
     {
 
-        public static ConsoleAddinConfiguration Current;
+        public new static ConsoleAddinConfiguration Current;
 
         static ConsoleAddinConfiguration()
         {

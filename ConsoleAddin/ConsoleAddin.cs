@@ -16,9 +16,9 @@ namespace ConsoleAddin
     {
         ConsoleAddinConfiguration Configuration { get; set; }
 
-        public override async Task OnApplicationStart()
+        public override void OnApplicationStart()
         {
-            await base.OnApplicationStart();
+            base.OnApplicationStart();
 
 
             // Id - should match output folder name. REMOVE 'Addin' from the Id
@@ -58,9 +58,9 @@ namespace ConsoleAddin
         }
 
 
-        public override async Task OnExecuteConfiguration(object sender)
+        public override void OnExecuteConfiguration(object sender)
         {
-            await Model.Window.OpenTab(Path.Combine(Model.Configuration.CommonFolder, "ConsoleAddin.json"));
+            Model.Window.OpenTab(Path.Combine(Model.Configuration.CommonFolder, "ConsoleAddin.json"));
         }
 
         public override bool OnCanExecute(object sender)
@@ -69,10 +69,9 @@ namespace ConsoleAddin
         }
 
 
-        public override Task OnApplicationShutdown()
+        public override void OnApplicationShutdown()
         {
             ReleaseConsole();
-            return Task.CompletedTask;
         }
 
 
@@ -80,7 +79,7 @@ namespace ConsoleAddin
         Process ConsoleProcess;
         ConsoleBox ConsoleRectangle;
 
-        public override Task OnExecute(object sender)
+        public override void OnExecute(object sender)
         {
             this.Configuration = ConsoleAddinConfiguration.Current;
 
@@ -88,8 +87,6 @@ namespace ConsoleAddin
                 CreateConsole();            
             else
                 ReleaseConsole(false); // allow re-opening if it was closed
-
-            return Task.CompletedTask;
         }
 
         
